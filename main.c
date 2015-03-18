@@ -24,6 +24,7 @@ int callback(void *NotUsed, int argc, char **argv,
 
 void add_expense() {
     int choice;
+    system("tput clear");
     printf("%s\n", "DONE");
     draw_main();
 }
@@ -38,6 +39,7 @@ void add_remove_user() {
 
 
     //clrscr();
+    system("tput clear");
     printf("%s\n", "1. Show User");
     printf("%s\n", "2. Add User");
     printf("%s\n", "3. Back");
@@ -87,6 +89,7 @@ void draw_main() {
     int choice;
 
     //clrscr();
+    system("tput clear");
     printf("%s\n", "1. Add/Remove User");
     printf("%s\n", "2. Add Expense");
     printf("%s\n", "0. exit");
