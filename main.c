@@ -4,21 +4,18 @@
 
 void draw_main();
 void add_expense();
+void show_user();
 void add_remove_user();
 int callback(void *, int, char **, char **);
 sqlite3 *db;
 
-int callback(void *NotUsed, int argc, char **argv,
-                    char **azColName) {
-
+int callback(void *NotUsed, int argc, char **argv, char **azColName) {
     NotUsed = 0;
 
     for (int i = 0; i < argc; i++) {
         printf("%10.10s|", argv[i] ? argv[i] : "NULL");
     }
-
     printf("\n");
-
     return 0;
 }
 
@@ -26,6 +23,24 @@ void add_expense() {
     int choice;
     printf("%s\n", "DONE");
     draw_main();
+}
+
+void show_user() {
+    int rc;
+    char *err_msg = 0;
+    printf("=================================\n");
+    printf("%10s|%10s|%10s|\n", "ID", "Username", "Owe");
+    rc = sqlite3_exec(db, "SELECT * FROM user", callback, 0, &err_msg);
+    if (rc != SQLITE_OK ) {
+        fprintf(stderr, "Failed to select data\n");
+        fprintf(stderr, "SQL error: %s\n", err_msg);
+
+        sqlite3_free(err_msg);
+        sqlite3_close(db);
+
+        exit(1);
+    }
+    printf("=================================\n");
 }
 
 void add_remove_user() {
@@ -46,35 +61,24 @@ void add_remove_user() {
     switch(choice) {
         case 1:
             system("clear");
-            printf("=================================\n");
-            printf("%10s|%10s|%10s|\n", "ID", "Username", "Owe");
-            rc = sqlite3_exec(db, "SELECT * FROM user", callback, 0, &err_msg);
-            if (rc != SQLITE_OK ) {
-
-                fprintf(stderr, "Failed to select data\n");
-                fprintf(stderr, "SQL error: %s\n", err_msg);
-
-                sqlite3_free(err_msg);
-                sqlite3_close(db);
-
-                exit(1);
-            }
-            printf("=================================\n");
+            show_user();
             add_remove_user();
             break;
         case 2:
             printf("%s", "Enter Username: ");
             scanf("%s", name);
+
             sprintf(sql, "INSERT INTO user(name, owe) VALUES ('%s', 0);", name);
             rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
+            system("clear");
             if (rc != SQLITE_OK ) {
                 printf("%s\n", "Failed to create table");
                 printf("SQL error: %s\n", err_msg);
                 sqlite3_free(err_msg);
             } else {
-                printf("%s\n", "User added successfully");
+                printf("User %s added successfully\n", name);
             }
-            system("clear");
+            printf("=================================\n");
             add_remove_user();
             break;
         case 3:
@@ -124,9 +128,8 @@ int main(void) {
     int rc = sqlite3_open("ljdata.db", &db);
 
     if (rc != SQLITE_OK) {
-
         fprintf(stderr, "Cannot open database: %s\n",
-                sqlite3_errmsg(db));
+        sqlite3_errmsg(db));
         sqlite3_close(db);
 
         exit(0);
