@@ -5,6 +5,22 @@
 void draw_main();
 void add_expense();
 void add_remove_user();
+int callback(void *, int, char **, char **);
+sqlite3 *db;
+
+int callback(void *NotUsed, int argc, char **argv,
+                    char **azColName) {
+
+    NotUsed = 0;
+
+    for (int i = 0; i < argc; i++) {
+        printf("%s = %s\n", azColName[i], argv[i] ? argv[i] : "NULL");
+    }
+
+    printf("\n");
+
+    return 0;
+}
 
 void add_expense() {
     int choice;
@@ -14,13 +30,50 @@ void add_expense() {
 
 void add_remove_user() {
     int choice;
+    char name[999];
+
+    char *err_msg = 0;
+    char sql[999] = " ";
+    int rc;
+
+
     //clrscr();
-    printf("%s\n", "DONE");
+    printf("%s\n", "1. Show User");
+    printf("%s\n", "2. Add User");
+    printf("%s\n", "3. Back");
 
     scanf("%d", &choice);
 
     switch(choice) {
         case 1:
+            rc = sqlite3_exec(db, "SELECT * FROM user", callback, 0, &err_msg);
+            if (rc != SQLITE_OK ) {
+
+                fprintf(stderr, "Failed to select data\n");
+                fprintf(stderr, "SQL error: %s\n", err_msg);
+
+                sqlite3_free(err_msg);
+                sqlite3_close(db);
+
+                exit(1);
+            }
+            add_remove_user();
+            break;
+        case 2:
+            printf("%s", "Enter Username: ");
+            scanf("%s", name);
+            sprintf(sql, "INSERT INTO user(name, owe) VALUES ('%s', 0);", name);
+            rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
+            if (rc != SQLITE_OK ) {
+                printf("%s\n", "Failed to create table");
+                printf("SQL error: %s\n", err_msg);
+                sqlite3_free(err_msg);
+            } else {
+                printf("%s\n", "User added successfully");
+            }
+            add_remove_user();
+            break;
+        case 3:
             draw_main();
             break;
         default:
@@ -58,8 +111,6 @@ void draw_main() {
 }
 
 int main(void) {
-
-    sqlite3 *db;
 
     int rc = sqlite3_open("ljdata.db", &db);
 
