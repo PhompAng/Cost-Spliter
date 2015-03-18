@@ -46,6 +46,7 @@ void show_user() {
 void add_remove_user() {
     int choice;
     char name[999];
+    char id[999];
 
     char *err_msg = 0;
     char sql[999] = " ";
@@ -53,14 +54,15 @@ void add_remove_user() {
 
     printf("%s\n", "1. Show User");
     printf("%s\n", "2. Add User");
-    printf("%s\n", "3. Back");
+    printf("%s\n", "3. Remove User");
+    printf("%s\n", "4. Back");
 
     printf("%s", "Enter choice: ");
     scanf("%d", &choice);
 
+    system("clear");
     switch(choice) {
         case 1:
-            system("clear");
             show_user();
             add_remove_user();
             break;
@@ -72,7 +74,6 @@ void add_remove_user() {
             rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
             system("clear");
             if (rc != SQLITE_OK ) {
-                printf("%s\n", "Failed to create table");
                 printf("SQL error: %s\n", err_msg);
                 sqlite3_free(err_msg);
             } else {
@@ -82,10 +83,26 @@ void add_remove_user() {
             add_remove_user();
             break;
         case 3:
+            show_user();
+            printf("%s", "Enter ID: ");
+            scanf("%s", id);
+
+            sprintf(sql, "DELETE FROM user WHERE id=%s;", id);
+            rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
+            system("clear");
+            if (rc != SQLITE_OK ) {
+                printf("SQL error: %s\n", err_msg);
+                sqlite3_free(err_msg);
+            } else {
+                printf("ID %s deleted successfully\n", id);
+            }
+            printf("=================================\n");
+            add_remove_user();
+            break;
+        case 4:
             draw_main();
             break;
         default:
-            system("clear");
             add_remove_user();
             break;
     }
