@@ -14,7 +14,7 @@ int callback(void *NotUsed, int argc, char **argv,
     NotUsed = 0;
 
     for (int i = 0; i < argc; i++) {
-        printf("%s = %s\n", azColName[i], argv[i] ? argv[i] : "NULL");
+        printf("%10.10s|", argv[i] ? argv[i] : "NULL");
     }
 
     printf("\n");
@@ -24,7 +24,6 @@ int callback(void *NotUsed, int argc, char **argv,
 
 void add_expense() {
     int choice;
-    system("tput clear");
     printf("%s\n", "DONE");
     draw_main();
 }
@@ -37,17 +36,18 @@ void add_remove_user() {
     char sql[999] = " ";
     int rc;
 
-
-    //clrscr();
-    system("tput clear");
     printf("%s\n", "1. Show User");
     printf("%s\n", "2. Add User");
     printf("%s\n", "3. Back");
 
+    printf("%s", "Enter choice: ");
     scanf("%d", &choice);
 
     switch(choice) {
         case 1:
+            system("clear");
+            printf("=================================\n");
+            printf("%10s|%10s|%10s|\n", "ID", "Username", "Owe");
             rc = sqlite3_exec(db, "SELECT * FROM user", callback, 0, &err_msg);
             if (rc != SQLITE_OK ) {
 
@@ -59,6 +59,7 @@ void add_remove_user() {
 
                 exit(1);
             }
+            printf("=================================\n");
             add_remove_user();
             break;
         case 2:
@@ -73,12 +74,14 @@ void add_remove_user() {
             } else {
                 printf("%s\n", "User added successfully");
             }
+            system("clear");
             add_remove_user();
             break;
         case 3:
             draw_main();
             break;
         default:
+            system("clear");
             add_remove_user();
             break;
     }
@@ -89,11 +92,12 @@ void draw_main() {
     int choice;
 
     //clrscr();
-    system("tput clear");
+    system("clear");
     printf("%s\n", "1. Add/Remove User");
     printf("%s\n", "2. Add Expense");
     printf("%s\n", "0. exit");
 
+    printf("%s", "Enter choice: ");
     scanf("%d", &choice);
 
     switch(choice) {
@@ -101,9 +105,11 @@ void draw_main() {
             return;
             break;
         case 1:
+            system("clear");
             add_remove_user();
             break;
         case 2:
+            system("clear");
             add_expense();
             break;
         default:
