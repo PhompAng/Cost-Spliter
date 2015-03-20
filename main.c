@@ -3,7 +3,8 @@
 #include <stdlib.h>
 
 void draw_main();
-void add_expense();
+void expense_manager();
+void show_expense();
 void show_user();
 void add_remove_user();
 int callback(void *, int, char **, char **);
@@ -19,10 +20,75 @@ int callback(void *NotUsed, int argc, char **argv, char **azColName) {
     return 0;
 }
 
-void add_expense() {
+void expense_manager() {
     int choice;
-    printf("%s\n", "DONE");
-    draw_main();
+    char name[999];
+    int amount;
+    char datetime[999];
+    int number_of_splitter;
+    int payer_id;
+    int splitter_id;
+
+    char *err_msg = 0;
+    char sql[999] = " ";
+    int rc;
+
+    printf("%s\n", "1. Show Expense");
+    printf("%s\n", "2. Add Expense");
+    printf("%s\n", "3. Back");
+
+    printf("%s", "Enter Choice: ");
+    scanf("%d", &choice);
+
+    switch(choice){
+        case 1:
+            show_expense();
+            expense_manager();
+            break;
+        case 2:
+            //TODO add_expense();
+            printf("%s", "Expense Name: ");
+            scanf("%s", name);
+            printf("%s", "Amount: ");
+            scanf("%d", &amount);
+            printf("%s", "Time: ");
+            scanf("%s", datetime);
+            printf("%s", "Number of Splitter: ");
+            scanf("%d", &number_of_splitter);
+            printf("%s", "Payer ID: ");
+            scanf("%d", &payer_id);
+            for (int i = 0; i < number_of_splitter; ++i)
+            {
+                printf("%s", "Splitter ID: ");
+                scanf("%d", &splitter_id);
+            }
+            expense_manager();
+            break;
+        case 3:
+            draw_main();
+            break;
+        default:
+            expense_manager();
+            break;
+    }
+}
+
+void show_expense() {
+    int rc;
+    char *err_msg = 0;
+    printf("=================================\n");
+    printf("%10s|%10s|%10s|%10s|\n", "ID", "Name", "Amount", "Time");
+    rc = sqlite3_exec(db, "SELECT * FROM expense", callback, 0, &err_msg);
+    if (rc != SQLITE_OK ) {
+        fprintf(stderr, "Failed to select data\n");
+        fprintf(stderr, "SQL error: %s\n", err_msg);
+
+        sqlite3_free(err_msg);
+        sqlite3_close(db);
+
+        exit(1);
+    }
+    printf("=================================\n");
 }
 
 void show_user() {
@@ -131,7 +197,7 @@ void draw_main() {
             break;
         case 2:
             system("clear");
-            add_expense();
+            expense_manager();
             break;
         default:
             draw_main();
