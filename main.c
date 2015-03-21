@@ -132,7 +132,7 @@ void add_remove_user() {
     switch(choice) {
         case 1:
             printf("=================================\n");
-            printf("%10s|%10s|%10s|\n", "ID", "Username", "Owe");
+            printf("%10s|%10s|\n", "ID", "Username");
             show_table("user");
             add_remove_user();
             break;
@@ -140,13 +140,17 @@ void add_remove_user() {
             printf("%s", "Enter Username: ");
             scanf("%s", name);
 
-            sprintf(sql, "INSERT INTO user(name, owe) VALUES ('%s', 0);", name);
+            sprintf(sql, "INSERT INTO user(name) VALUES ('%s');", name);
             rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
             system("clear");
             if (rc != SQLITE_OK ) {
                 printf("SQL error: %s\n", err_msg);
                 sqlite3_free(err_msg);
             } else {
+                sprintf(sql, "ALTER TABLE spent_detail ADD COLUMN %s INTEGER DEFAULT 0;", name);
+                rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
+                sprintf(sql, "ALTER TABLE paid_detail ADD COLUMN %s INTEGER DEFAULT 0;", name);
+                rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
                 printf("User %s added successfully\n", name);
             }
             printf("=================================\n");
@@ -154,7 +158,7 @@ void add_remove_user() {
             break;
         case 3:
             printf("=================================\n");
-            printf("%10s|%10s|%10s|\n", "ID", "Username", "Owe");
+            printf("%10s|%10s|\n", "ID", "Username");
             show_table("user");
             printf("%s", "Enter ID: ");
             scanf("%s", id);
