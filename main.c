@@ -3,6 +3,7 @@
 #include <stdlib.h>
 
 void draw_main();
+void add_expense(char[], int, char[], char[]);
 void expense_manager();
 void show_table(char[]);
 //void show_user();
@@ -20,14 +21,38 @@ int callback(void *NotUsed, int argc, char **argv, char **azColName) {
     return 0;
 }
 
+void add_expense(char name[], int amount, char datetime[], char payer_name[]) {
+    int rc;
+    char *err_msg = 0;
+    char sql[999] = " ";
+    sprintf(sql, "INSERT INTO expense(name, amount, datetime) VALUES ('%s', '%d', '%s');", name, amount, datetime);
+    rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
+    system("clear");
+    if (rc != SQLITE_OK ) {
+        printf("SQL error: %s\n", err_msg);
+        sqlite3_free(err_msg);
+    } else {
+        sprintf(sql, "INSERT INTO paid_detail(%s) VALUES ('%d');", payer_name, amount);
+        rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
+        if (rc != SQLITE_OK ) {
+            printf("SQL error: %s\n", err_msg);
+            sqlite3_free(err_msg);
+        } else {
+            printf("Add Expense successfully\n");
+            printf("name: %s\namount: %d\npayer: %s\n", name, amount, payer_name);
+        }
+    }
+    printf("=================================\n");
+}
+
 void expense_manager() {
     int choice;
     char name[999];
     int amount;
     char datetime[999];
     int number_of_splitter;
-    int payer_id;
-    int splitter_id;
+    char payer_name[999];
+    char splitter_name[999];
 
     char *err_msg = 0;
     char sql[999] = " ";
@@ -40,6 +65,7 @@ void expense_manager() {
     printf("%s", "Enter Choice: ");
     scanf("%d", &choice);
 
+    system("clear");
     switch(choice){
         case 1:
             printf("=================================\n");
@@ -48,22 +74,27 @@ void expense_manager() {
             expense_manager();
             break;
         case 2:
-            //TODO add_expense();
             printf("%s", "Expense Name: ");
-            scanf("%s", name);
+            scanf(" %s", name);
+
             printf("%s", "Amount: ");
-            scanf("%d", &amount);
+            scanf(" %d", &amount);
+
             printf("%s", "Time: ");
-            scanf("%s", datetime);
+            scanf(" %[^\n]s", datetime);
+
+            printf("%s", "Payer name: ");
+            scanf(" %s", payer_name);
+
             printf("%s", "Number of Splitter: ");
             scanf("%d", &number_of_splitter);
-            printf("%s", "Payer ID: ");
-            scanf("%d", &payer_id);
             for (int i = 0; i < number_of_splitter; ++i)
             {
-                printf("%s", "Splitter ID: ");
-                scanf("%d", &splitter_id);
+                printf("%s", "Splitter name: ");
+                scanf(" %s", splitter_name);
             }
+            //TODO add split to split_detail
+            add_expense(name, amount, datetime, payer_name);
             expense_manager();
             break;
         case 3:
