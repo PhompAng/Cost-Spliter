@@ -75,23 +75,23 @@ void expense_manager() {
             break;
         case 2:
             printf("%s", "Expense Name: ");
-            scanf(" %s", name);
+            scanf("%[^\n]s", name);
 
             printf("%s", "Amount: ");
             scanf(" %d", &amount);
 
             printf("%s", "Time: ");
-            scanf(" %[^\n]s", datetime);
+            scanf("%[^\n]s", datetime);
 
             printf("%s", "Payer name: ");
-            scanf(" %s", payer_name);
+            scanf("%s", payer_name);
 
             printf("%s", "Number of Splitter: ");
             scanf("%d", &number_of_splitter);
             for (int i = 0; i < number_of_splitter; ++i)
             {
                 printf("%s", "Splitter name: ");
-                scanf(" %s", splitter_name);
+                scanf("%s", splitter_name);
             }
             //TODO add split to split_detail
             add_expense(name, amount, datetime, payer_name);
