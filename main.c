@@ -1,6 +1,7 @@
 #include <sqlite3.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 void draw_main();
 void add_expense(char[], int, char[], char[]);
@@ -47,8 +48,11 @@ void add_expense(char name[], int amount, char datetime[], char payer_name[]) {
 
 void expense_manager() {
     int choice;
+
     char name[999];
     int amount;
+    int split;
+    char split_str[999];
     char datetime[999];
     int number_of_splitter;
     char payer_name[999];
@@ -75,25 +79,55 @@ void expense_manager() {
             break;
         case 2:
             printf("%s", "Expense Name: ");
-            scanf("%[^\n]s", name);
+            scanf(" %[^\n]s", name);
 
             printf("%s", "Amount: ");
-            scanf(" %d", &amount);
+            scanf("%d", &amount);
 
             printf("%s", "Time: ");
-            scanf("%[^\n]s", datetime);
+            scanf(" %[^\n]s", datetime);
+
+            printf("=================================\n");
+            printf("%10s|%10s|\n", "ID", "Username");
+            show_table("user");
 
             printf("%s", "Payer name: ");
             scanf("%s", payer_name);
 
             printf("%s", "Number of Splitter: ");
             scanf("%d", &number_of_splitter);
-            for (int i = 0; i < number_of_splitter; ++i)
+            strcpy(sql, "INSERT INTO spent_detail(");
+            for (int i = 1; i <= number_of_splitter; ++i)
             {
                 printf("%s", "Splitter name: ");
                 scanf("%s", splitter_name);
+                strcat(sql, splitter_name);
+                if (i == number_of_splitter) {
+                    strcat(sql, ") VALUES (");
+                } else {
+                    strcat(sql, ",");
+                }
             }
-            //TODO add split to split_detail
+            for (int i = 1; i <= number_of_splitter; ++i)
+            {
+                strcat(sql, "'");
+                sprintf(split_str, "%d", amount/number_of_splitter);
+                strcat(sql, split_str);
+                if (i == number_of_splitter) {
+                    strcat(sql, "');");
+                } else {
+                    strcat(sql, "',");
+                }
+            }
+
+            rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
+            if (rc != SQLITE_OK ) {
+                printf("SQL error: %s\n", err_msg);
+                sqlite3_free(err_msg);
+            } else {
+                printf("Add Expense successfully\n");
+            }
+
             add_expense(name, amount, datetime, payer_name);
             expense_manager();
             break;
