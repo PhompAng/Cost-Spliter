@@ -4,7 +4,7 @@
 #include <string.h>
 
 void draw_main();
-void add_expense(char[], int, char[], char[]);
+void add_expense(char[], double, char[], char[]);
 void expense_manager();
 void show_table(char[]);
 //void show_user();
@@ -22,25 +22,25 @@ int callback(void *NotUsed, int argc, char **argv, char **azColName) {
     return 0;
 }
 
-void add_expense(char name[], int amount, char datetime[], char payer_name[]) {
+void add_expense(char name[], double amount, char datetime[], char payer_name[]) {
     int rc;
     char *err_msg = 0;
     char sql[999] = " ";
-    sprintf(sql, "INSERT INTO expense(name, amount, datetime) VALUES ('%s', '%d', '%s');", name, amount, datetime);
+    sprintf(sql, "INSERT INTO expense(name, amount, datetime) VALUES ('%s', '%.2lf', '%s');", name, amount, datetime);
     rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
     system("clear");
     if (rc != SQLITE_OK ) {
         printf("SQL error: %s\n", err_msg);
         sqlite3_free(err_msg);
     } else {
-        sprintf(sql, "INSERT INTO paid_detail(%s) VALUES ('%d');", payer_name, amount);
+        sprintf(sql, "INSERT INTO paid_detail(%s) VALUES ('%.2lf');", payer_name, amount);
         rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
         if (rc != SQLITE_OK ) {
             printf("SQL error: %s\n", err_msg);
             sqlite3_free(err_msg);
         } else {
             printf("Add Expense successfully\n");
-            printf("name: %s\namount: %d\npayer: %s\n", name, amount, payer_name);
+            printf("name: %s\namount: %.2lf\npayer: %s\n", name, amount, payer_name);
         }
     }
     printf("=================================\n");
@@ -50,8 +50,8 @@ void expense_manager() {
     int choice;
 
     char name[999];
-    int amount;
-    int split;
+    double amount;
+    double split;
     char split_str[999];
     char datetime[999];
     int number_of_splitter;
@@ -82,7 +82,7 @@ void expense_manager() {
             scanf(" %[^\n]s", name);
 
             printf("%s", "Amount: ");
-            scanf("%d", &amount);
+            scanf("%lf", &amount);
 
             printf("%s", "Time: ");
             scanf(" %[^\n]s", datetime);
@@ -111,7 +111,8 @@ void expense_manager() {
             for (int i = 1; i <= number_of_splitter; ++i)
             {
                 strcat(sql, "'");
-                sprintf(split_str, "%d", amount/number_of_splitter);
+                split = amount/number_of_splitter;
+                sprintf(split_str, "%.2lf", split);
                 strcat(sql, split_str);
                 if (i == number_of_splitter) {
                     strcat(sql, "');");
@@ -212,9 +213,9 @@ void add_remove_user() {
                 printf("SQL error: %s\n", err_msg);
                 sqlite3_free(err_msg);
             } else {
-                sprintf(sql, "ALTER TABLE spent_detail ADD COLUMN %s INTEGER DEFAULT 0;", name);
+                sprintf(sql, "ALTER TABLE spent_detail ADD COLUMN %s REAL DEFAULT 0;", name);
                 rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
-                sprintf(sql, "ALTER TABLE paid_detail ADD COLUMN %s INTEGER DEFAULT 0;", name);
+                sprintf(sql, "ALTER TABLE paid_detail ADD COLUMN %s REAL DEFAULT 0;", name);
                 rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
                 printf("User %s added successfully\n", name);
             }
