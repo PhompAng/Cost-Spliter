@@ -7,7 +7,6 @@ void draw_main();
 void add_expense(char[], double, char[], char[]);
 void expense_manager();
 void show_table(char[]);
-//void show_user();
 void add_remove_user();
 int callback(void *, int, char **, char **);
 sqlite3 *db;
@@ -158,25 +157,7 @@ void show_table(char table[]) {
     }
     printf("=================================\n");
 }
-/*
-void show_user() {
-    int rc;
-    char *err_msg = 0;
-    printf("=================================\n");
-    printf("%10s|%10s|%10s|\n", "ID", "Username", "Owe");
-    rc = sqlite3_exec(db, "SELECT * FROM user", callback, 0, &err_msg);
-    if (rc != SQLITE_OK ) {
-        fprintf(stderr, "Failed to select data\n");
-        fprintf(stderr, "SQL error: %s\n", err_msg);
 
-        sqlite3_free(err_msg);
-        sqlite3_close(db);
-
-        exit(1);
-    }
-    printf("=================================\n");
-}
-*/
 void add_remove_user() {
     int choice;
     char name[999];
@@ -248,13 +229,11 @@ void add_remove_user() {
             add_remove_user();
             break;
     }
-
 }
 
 void draw_main() {
     int choice;
 
-    //clrscr();
     system("clear");
     printf("%s\n", "1. Add/Remove User");
     printf("%s\n", "2. Add Expense");
@@ -279,11 +258,9 @@ void draw_main() {
             draw_main();
             break;
     }
-
 }
 
 int main(void) {
-
     int rc = sqlite3_open("ljdata.db", &db);
 
     if (rc != SQLITE_OK) {
