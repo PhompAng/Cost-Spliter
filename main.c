@@ -180,7 +180,14 @@ void show_balance() {
 
         exit(1);
     }
+
     int cols = sqlite3_column_count(stmt);
+    printf("%10.10s|", "User");
+    for (int i=1; i<cols; i++) {
+        printf("%10.10s|", sqlite3_column_name(stmt, i));
+    }
+
+    printf("\n%10.10s|", "Paid");
     for (int i=1; i<cols; i++) {
         sprintf(sql, "SELECT sum(%s) FROM paid_detail", sqlite3_column_name(stmt, i));
         rc = sqlite3_exec(db, sql, callback1, 0, &err_msg);
@@ -194,7 +201,8 @@ void show_balance() {
             exit(1);
         }
     }
-    printf("\n");
+
+    printf("\n%10.10s|", "Consumed");
     for (int i=1; i<cols; i++) {
         sprintf(sql, "SELECT sum(%s) FROM spent_detail", sqlite3_column_name(stmt, i));
         rc = sqlite3_exec(db, sql, callback1, 0, &err_msg);
@@ -208,8 +216,8 @@ void show_balance() {
             exit(1);
         }
     }
-    printf("\n");
 
+    printf("\n%10.10s|", "Balance");
     for (int i=1; i<cols; i++) {
         sprintf(sql, "SELECT sum(%s) FROM balance_detail", sqlite3_column_name(stmt, i));
         rc = sqlite3_exec(db, sql, callback1, 0, &err_msg);
