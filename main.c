@@ -6,7 +6,7 @@
 void draw_main();
 void add_expense(char[], double, char[], char[]);
 void expense_manager();
-void show_result();
+void show_balance();
 void show_table(char[]);
 void add_remove_user();
 int callback(void *, int, char **, char **);
@@ -62,6 +62,7 @@ void expense_manager() {
     double amount;
     double split;
     char split_str[999];
+    char balance_str[999];
     char datetime[999];
     int number_of_splitter;
     char payer_name[999];
@@ -69,6 +70,7 @@ void expense_manager() {
 
     char *err_msg = 0;
     char sql[999] = " ";
+    char sql1[999] = " ";
     int rc;
 
     printf("%s\n", "1. Show Expense");
@@ -102,35 +104,47 @@ void expense_manager() {
 
             printf("%s", "Payer name: ");
             scanf("%s", payer_name);
+            sprintf(sql, "INSERT INTO balance_detail(%s) VALUES ('%.2lf')", payer_name, amount);
+            rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
 
             printf("%s", "Number of Splitter: ");
             scanf("%d", &number_of_splitter);
             strcpy(sql, "INSERT INTO spent_detail(");
+            strcpy(sql1, "INSERT INTO balance_detail(");
             for (int i = 1; i <= number_of_splitter; ++i)
             {
                 printf("%s", "Splitter name: ");
                 scanf("%s", splitter_name);
                 strcat(sql, splitter_name);
+                strcat(sql1, splitter_name);
                 if (i == number_of_splitter) {
                     strcat(sql, ") VALUES (");
+                    strcat(sql1, ") VALUES (");
                 } else {
                     strcat(sql, ",");
+                    strcat(sql1, ",");
                 }
             }
             for (int i = 1; i <= number_of_splitter; ++i)
             {
                 strcat(sql, "'");
+                strcat(sql1, "'");
                 split = amount/number_of_splitter;
                 sprintf(split_str, "%.2lf", split);
+                sprintf(balance_str, "%.2lf", -split);
                 strcat(sql, split_str);
+                strcat(sql1, balance_str);
                 if (i == number_of_splitter) {
                     strcat(sql, "');");
+                    strcat(sql1, "');");
                 } else {
                     strcat(sql, "',");
+                    strcat(sql1, "',");
                 }
             }
 
             rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
+            rc = sqlite3_exec(db, sql1, 0, 0, &err_msg);
             if (rc != SQLITE_OK ) {
                 printf("SQL error: %s\n", err_msg);
                 sqlite3_free(err_msg);
@@ -151,7 +165,7 @@ void expense_manager() {
 }
 
 
-void show_result() {
+void show_balance() {
     sqlite3_stmt *stmt;
     int rc;
     char *err_msg = 0;
@@ -183,6 +197,21 @@ void show_result() {
     printf("\n");
     for (int i=1; i<cols; i++) {
         sprintf(sql, "SELECT sum(%s) FROM spent_detail", sqlite3_column_name(stmt, i));
+        rc = sqlite3_exec(db, sql, callback1, 0, &err_msg);
+        if (rc != SQLITE_OK ) {
+            fprintf(stderr, "Failed to select data\n");
+            fprintf(stderr, "SQL error: %s\n", err_msg);
+
+            sqlite3_free(err_msg);
+            sqlite3_close(db);
+
+            exit(1);
+        }
+    }
+    printf("\n");
+
+    for (int i=1; i<cols; i++) {
+        sprintf(sql, "SELECT sum(%s) FROM balance_detail", sqlite3_column_name(stmt, i));
         rc = sqlite3_exec(db, sql, callback1, 0, &err_msg);
         if (rc != SQLITE_OK ) {
             fprintf(stderr, "Failed to select data\n");
@@ -258,6 +287,8 @@ void add_remove_user() {
                 rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
                 sprintf(sql, "ALTER TABLE paid_detail ADD COLUMN %s REAL DEFAULT 0;", name);
                 rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
+                sprintf(sql, "ALTER TABLE balance_detail ADD COLUMN %s REAL DEFAULT 0;", name);
+                rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
                 printf("User %s added successfully\n", name);
             }
             printf("=================================\n");
@@ -296,7 +327,7 @@ void draw_main() {
 
     printf("%s\n", "1. Add/Remove User");
     printf("%s\n", "2. Add Expense");
-    printf("%s\n", "3. Show Result");
+    printf("%s\n", "3. Show Balance");
     printf("%s\n", "0. exit");
 
     printf("%s", "Enter choice: ");
@@ -314,7 +345,7 @@ void draw_main() {
             expense_manager();
             break;
         case 3:
-            show_result();
+            show_balance();
             draw_main();
             break;
         default:
