@@ -14,6 +14,7 @@ void user_manager();
 int callback(void *, int, char **, char **);
 int callback1(void *, int, char **, char **);
 sqlite3 *db;
+sqlite3_stmt *stmt;
 
 int callback(void *NotUsed, int argc, char **argv, char **azColName) {
     NotUsed = 0;
@@ -85,8 +86,6 @@ void expense_manager() {
     system("clear");
     switch(choice){
         case 1:
-            printf("=================================\n");
-            printf("%10s|%10s|%10s|%10s|\n", "ID", "Name", "Amount", "Time");
             show_table("expense");
             expense_manager();
             break;
@@ -100,8 +99,6 @@ void expense_manager() {
             printf("%s", "Time: ");
             scanf(" %[^\n]s", datetime);
 
-            printf("=================================\n");
-            printf("%10s|%10s|\n", "ID", "Username");
             show_table("user");
 
             printf("%s", "Payer name: ");
@@ -168,7 +165,6 @@ void expense_manager() {
 
 
 void show_balance() {
-    sqlite3_stmt *stmt;
     int rc;
     char *err_msg = 0;
     char sql[999] = " ";
@@ -244,6 +240,15 @@ void show_table(char table[]) {
     char *err_msg = 0;
     char sql[999] = " ";
 
+    sprintf(sql, "SELECT * FROM %s", table);
+    rc = sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
+    int cols = sqlite3_column_count(stmt);
+
+    for (int i=0; i<cols; i++) {
+        printf("%10.10s|", sqlite3_column_name(stmt, i));
+    }
+    printf("\n");
+
     sprintf(sql, "SELECT * FROM %s;", table);
     rc = sqlite3_exec(db, sql, callback, 0, &err_msg);
     if (rc != SQLITE_OK ) {
@@ -318,8 +323,6 @@ void user_manager() {
     system("clear");
     switch(choice) {
         case 1:
-            printf("=================================\n");
-            printf("%10s|%10s|\n", "ID", "Username");
             show_table("user");
 
             user_manager();
@@ -334,9 +337,8 @@ void user_manager() {
             user_manager();
             break;
         case 3:
-            printf("=================================\n");
-            printf("%10s|%10s|\n", "ID", "Username");
             show_table("user");
+
             printf("%s", "Enter ID: ");
             scanf("%s", id);
 
