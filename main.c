@@ -8,7 +8,9 @@ void add_expense(char[], double, char[], char[]);
 void expense_manager();
 void show_balance();
 void show_table(char[]);
-void add_remove_user();
+void add_user(char[]);
+void remove_user(char[]);
+void user_manager();
 int callback(void *, int, char **, char **);
 int callback1(void *, int, char **, char **);
 sqlite3 *db;
@@ -241,6 +243,7 @@ void show_table(char table[]) {
     int rc;
     char *err_msg = 0;
     char sql[999] = " ";
+
     sprintf(sql, "SELECT * FROM %s;", table);
     rc = sqlite3_exec(db, sql, callback, 0, &err_msg);
     if (rc != SQLITE_OK ) {
@@ -255,7 +258,47 @@ void show_table(char table[]) {
     printf("=================================\n");
 }
 
-void add_remove_user() {
+void add_user(char name[]) {
+    int rc;
+    char *err_msg = 0;
+    char sql[999] = " ";
+
+    sprintf(sql, "INSERT INTO user(name) VALUES ('%s');", name);
+    rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
+    system("clear");
+    if (rc != SQLITE_OK ) {
+        printf("SQL error: %s\n", err_msg);
+        sqlite3_free(err_msg);
+    } else {
+        sprintf(sql, "ALTER TABLE spent_detail ADD COLUMN %s REAL DEFAULT 0;", name);
+        rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
+        sprintf(sql, "ALTER TABLE paid_detail ADD COLUMN %s REAL DEFAULT 0;", name);
+        rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
+        sprintf(sql, "ALTER TABLE balance_detail ADD COLUMN %s REAL DEFAULT 0;", name);
+        rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
+        printf("User %s added successfully\n", name);
+    }
+}
+
+void remove_user(char id[]) {
+    int rc;
+    char *err_msg = 0;
+    char sql[999] = " ";
+
+
+    // remove_user() doesn't remove column in paid_detail, spent_detail, and balance_detail
+    sprintf(sql, "DELETE FROM user WHERE id=%s;", id);
+    rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
+    system("clear");
+    if (rc != SQLITE_OK ) {
+        printf("SQL error: %s\n", err_msg);
+        sqlite3_free(err_msg);
+    } else {
+        printf("ID %s deleted successfully\n", id);
+    }
+}
+
+void user_manager() {
     int choice;
     char name[999];
     char id[999];
@@ -278,29 +321,17 @@ void add_remove_user() {
             printf("=================================\n");
             printf("%10s|%10s|\n", "ID", "Username");
             show_table("user");
-            add_remove_user();
+
+            user_manager();
             break;
         case 2:
             printf("%s", "Enter Username: ");
             scanf("%s", name);
 
-            sprintf(sql, "INSERT INTO user(name) VALUES ('%s');", name);
-            rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
-            system("clear");
-            if (rc != SQLITE_OK ) {
-                printf("SQL error: %s\n", err_msg);
-                sqlite3_free(err_msg);
-            } else {
-                sprintf(sql, "ALTER TABLE spent_detail ADD COLUMN %s REAL DEFAULT 0;", name);
-                rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
-                sprintf(sql, "ALTER TABLE paid_detail ADD COLUMN %s REAL DEFAULT 0;", name);
-                rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
-                sprintf(sql, "ALTER TABLE balance_detail ADD COLUMN %s REAL DEFAULT 0;", name);
-                rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
-                printf("User %s added successfully\n", name);
-            }
+            add_user(name);
             printf("=================================\n");
-            add_remove_user();
+
+            user_manager();
             break;
         case 3:
             printf("=================================\n");
@@ -309,23 +340,15 @@ void add_remove_user() {
             printf("%s", "Enter ID: ");
             scanf("%s", id);
 
-            sprintf(sql, "DELETE FROM user WHERE id=%s;", id);
-            rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
-            system("clear");
-            if (rc != SQLITE_OK ) {
-                printf("SQL error: %s\n", err_msg);
-                sqlite3_free(err_msg);
-            } else {
-                printf("ID %s deleted successfully\n", id);
-            }
+            remove_user(id);
             printf("=================================\n");
-            add_remove_user();
+            user_manager();
             break;
         case 4:
             draw_main();
             break;
         default:
-            add_remove_user();
+            user_manager();
             break;
     }
 }
@@ -333,10 +356,10 @@ void add_remove_user() {
 void draw_main() {
     int choice;
 
-    printf("%s\n", "1. Add/Remove User");
-    printf("%s\n", "2. Add Expense");
+    printf("%s\n", "1. User Manager");
+    printf("%s\n", "2. Expense Manager");
     printf("%s\n", "3. Show Balance");
-    printf("%s\n", "0. exit");
+    printf("%s\n", "0. Exit");
 
     printf("%s", "Enter choice: ");
     scanf("%d", &choice);
@@ -347,7 +370,7 @@ void draw_main() {
             return;
             break;
         case 1:
-            add_remove_user();
+            user_manager();
             break;
         case 2:
             expense_manager();
