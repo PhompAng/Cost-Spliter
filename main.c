@@ -9,6 +9,7 @@ void expense_manager();
 void show_balance();
 void show_sum(char[]);
 void show_table(char[]);
+void alter_tabel(char[], char[]);
 void add_user(char[]);
 void remove_user(char[]);
 void user_manager();
@@ -244,6 +245,17 @@ void show_table(char table[]) {
     printf("=================================\n");
 }
 
+void alter_tabel(char table[], char name[]) {
+    int rc;
+    char sql[999] = " ";
+    sprintf(sql, "ALTER TABLE %s ADD COLUMN %s REAL DEFAULT 0;", table, name);
+    rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
+    if (rc != SQLITE_OK) {
+        printf("SQL error: %s\n", err_msg);
+        sqlite3_free(err_msg);
+    }
+}
+
 void add_user(char name[]) {
     int rc;
     char sql[999] = " ";
@@ -255,12 +267,9 @@ void add_user(char name[]) {
         printf("SQL error: %s\n", err_msg);
         sqlite3_free(err_msg);
     } else {
-        sprintf(sql, "ALTER TABLE spent_detail ADD COLUMN %s REAL DEFAULT 0;", name);
-        rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
-        sprintf(sql, "ALTER TABLE paid_detail ADD COLUMN %s REAL DEFAULT 0;", name);
-        rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
-        sprintf(sql, "ALTER TABLE balance_detail ADD COLUMN %s REAL DEFAULT 0;", name);
-        rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
+        alter_tabel("spent_detail", name);
+        alter_tabel("paid_detail", name);
+        alter_tabel("balance_detail", name);
         printf("User %s added successfully\n", name);
     }
 }
