@@ -6,6 +6,7 @@
 void draw_main();
 void add_expense(char[], double, char[], char[]);
 void expense_manager();
+void show_owe();
 void show_balance();
 void show_sum(char[]);
 void show_table(char[]);
@@ -14,7 +15,7 @@ void add_user(char[]);
 void remove_user(char[]);
 void user_manager();
 int callback(void *, int, char **, char **);
-int callback1(void *, int, char **, char **);
+int callback_no_new_line(void *, int, char **, char **);
 sqlite3 *db;
 sqlite3_stmt *stmt;
 char *err_msg = 0;
@@ -28,7 +29,7 @@ int callback(void *NotUsed, int argc, char **argv, char **azColName) {
     printf("\n");
     return 0;
 }
-int callback1(void *NotUsed, int argc, char **argv, char **azColName) {
+int callback_no_new_line(void *NotUsed, int argc, char **argv, char **azColName) {
     NotUsed = 0;
 
     for (int i = 0; i < argc; i++) {
@@ -164,6 +165,41 @@ void expense_manager() {
     }
 }
 
+void show_owe() {
+    int rc;
+    char sql[999] = " ";
+    rc = sqlite3_prepare_v2(db, "SELECT * FROM paid_detail", -1, &stmt, 0);
+    if (rc != SQLITE_OK ) {
+        fprintf(stderr, "Failed to select data\n");
+        fprintf(stderr, "SQL error: %s\n", err_msg);
+
+        sqlite3_free(err_msg);
+        sqlite3_close(db);
+
+        exit(1);
+    }
+
+    int cols = sqlite3_column_count(stmt);
+    char **name_ptr;
+    name_ptr = (char **)malloc(cols * sizeof(char *));
+
+    for (int i=1; i<cols; i++) {
+        name_ptr[i-1] = (char*)malloc(255);
+        strcpy(name_ptr[i-1], sqlite3_column_name(stmt, i));
+    }
+
+    printf("\n%s\n", "--------------");
+    for (int i=0; i<cols; i++) {
+        printf("%s\n", name_ptr[i]);
+    }
+
+    for (int i=0; i<cols; i++) {
+        free(name_ptr[i]);
+    }
+
+    free(name_ptr);
+
+}
 
 void show_balance() {
     int rc;
@@ -194,6 +230,8 @@ void show_balance() {
     printf("\n%10.10s|", "Balance");
     show_sum("balance_detail");
 
+    show_owe();
+
     printf("\n=================================\n");
 
 }
@@ -205,7 +243,7 @@ void show_sum(char table[]) {
     int cols = sqlite3_column_count(stmt);
     for (int i=1; i<cols; i++) {
         sprintf(sql, "SELECT sum(%s) FROM %s", sqlite3_column_name(stmt, i), table);
-        rc = sqlite3_exec(db, sql, callback1, 0, &err_msg);
+        rc = sqlite3_exec(db, sql, callback_no_new_line, 0, &err_msg);
         if (rc != SQLITE_OK ) {
             fprintf(stderr, "Failed to select data\n");
             fprintf(stderr, "SQL error: %s\n", err_msg);
