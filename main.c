@@ -168,7 +168,7 @@ void expense_manager() {
 void show_owe() {
     int rc;
     char sql[999] = " ";
-    rc = sqlite3_prepare_v2(db, "SELECT * FROM paid_detail", -1, &stmt, 0);
+    rc = sqlite3_prepare_v2(db, "SELECT * FROM balance_detail", -1, &stmt, 0);
     if (rc != SQLITE_OK ) {
         fprintf(stderr, "Failed to select data\n");
         fprintf(stderr, "SQL error: %s\n", err_msg);
@@ -181,23 +181,39 @@ void show_owe() {
 
     int cols = sqlite3_column_count(stmt);
     char **name_ptr;
+    int *balance_ptr;
     name_ptr = (char **)malloc(cols * sizeof(char *));
+    balance_ptr = (int *)calloc(cols, sizeof(int *));
 
     for (int i=1; i<cols; i++) {
         name_ptr[i-1] = (char*)malloc(255);
         strcpy(name_ptr[i-1], sqlite3_column_name(stmt, i));
     }
 
-    printf("\n%s\n", "--------------");
-    for (int i=0; i<cols; i++) {
+    rc = sqlite3_prepare_v2(db, "SELECT * FROM balance_detail", -1, &stmt, 0);
+    for (int i = 1; i < cols; i++) {
+        *(balance_ptr+i-1) = 0;
+        while (sqlite3_step(stmt) == SQLITE_ROW) {
+            *(balance_ptr+i-1) += sqlite3_column_int(stmt, i);
+        }
+    }
+
+    printf("\n%s\n", "--------------------");
+    for (int i=0; i<cols-1; i++) {
         printf("%s\n", name_ptr[i]);
     }
 
-    for (int i=0; i<cols; i++) {
+    printf("\n%s\n", "--------------.............");
+    for (int i=0; i<cols-1; i++) {
+        printf("%d\n", *(balance_ptr+i));
+    }
+
+    for (int i=0; i<cols-1; i++) {
         free(name_ptr[i]);
     }
 
     free(name_ptr);
+    free(balance_ptr);
 
 }
 
