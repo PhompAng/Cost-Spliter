@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 void draw_main();
 void add_expense(char[], double, char[], char[]);
@@ -198,14 +199,37 @@ void show_owe() {
         }
     }
 
-    printf("\n%s\n", "--------------------");
-    for (int i=0; i<cols-1; i++) {
-        printf("%s\n", name_ptr[i]);
-    }
-
-    printf("\n%s\n", "--------------.............");
-    for (int i=0; i<cols-1; i++) {
-        printf("%d\n", *(balance_ptr+i));
+    //When I wrote this, only God and I understood what I was doing
+    //Now, God only knows
+    for (int i = 0; i < cols-1; ++i)
+    {
+        if (*(balance_ptr+i) == 0) {
+            continue;
+        }
+        for (int j = i; j < cols-1; ++j)
+        {
+            if (*(balance_ptr+i) > 0 && *(balance_ptr+j) < 0) {
+                if (abs(*(balance_ptr+i)) >= abs(*(balance_ptr+j))) {
+                    printf("%s owe %s = %d\n", name_ptr[j], name_ptr[i], abs(*(balance_ptr+j)));
+                    *(balance_ptr+i) += *(balance_ptr+j);
+                    *(balance_ptr+j) = 0;
+                } else {
+                    printf("%s owe %s = %d\n", name_ptr[j], name_ptr[i], abs(*(balance_ptr+i)));
+                    *(balance_ptr+j) += *(balance_ptr+i);
+                    *(balance_ptr+i) = 0;
+                }
+            } else if (*(balance_ptr+i) < 0 && *(balance_ptr+j) > 0) {
+                if (abs(*(balance_ptr+j)) >= abs(*(balance_ptr+i))) {
+                    printf("%s owe %s = %d\n", name_ptr[i], name_ptr[j], abs(*(balance_ptr+i)));
+                    *(balance_ptr+j) += *(balance_ptr+i);
+                    *(balance_ptr+i) = 0;
+                } else {
+                    printf("%s owe %s = %d\n", name_ptr[i], name_ptr[j], abs(*(balance_ptr+j)));
+                    *(balance_ptr+i) += *(balance_ptr+j);
+                    *(balance_ptr+j) = 0;
+                }
+            }
+        }
     }
 
     for (int i=0; i<cols-1; i++) {
@@ -240,10 +264,10 @@ void show_balance() {
     printf("\n%10.10s|", "Paid");
     show_sum("paid_detail");
 
-    printf("\n%10.10s|", "Consumed");
+    printf("%10.10s|", "Consumed");
     show_sum("spent_detail");
 
-    printf("\n%10.10s|", "Balance");
+    printf("%10.10s|", "Balance");
     show_sum("balance_detail");
 
     show_owe();
@@ -270,6 +294,7 @@ void show_sum(char table[]) {
             exit(1);
         }
     }
+    printf("\n");
 }
 
 void show_table(char table[]) {
