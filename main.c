@@ -42,7 +42,7 @@ int callback_no_new_line(void *NotUsed, int argc, char **argv, char **azColName)
 void add_expense(char name[], double amount, char datetime[], char payer_name[]) {
     int rc;
     char sql[999] = " ";
-    sprintf(sql, "INSERT INTO expense(name, amount, datetime) VALUES ('%s', '%.2lf', '%s');", name, amount, datetime);
+    sprintf(sql, "INSERT INTO expense(name, amount, payer_name, datetime) VALUES ('%s', '%.2lf', '%s', '%s');", name, amount, payer_name, datetime);
     rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
     system("clear");
     if (rc != SQLITE_OK ) {
