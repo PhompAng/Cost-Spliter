@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <time.h>
 
 void draw_main();
 void add_expense(char[], double, char[], char[]);
@@ -70,7 +71,15 @@ void expense_manager() {
     double split;
     char split_str[999];
     char balance_str[999];
-    char datetime[999];
+
+    time_t timer;
+    struct tm* tm_info;
+    char datetime[26];
+
+    time(&timer);
+    tm_info = localtime(&timer);
+    strftime(datetime, 26, "%Y-%m-%d %H:%M:%S", tm_info);
+
     int number_of_splitter;
     char payer_name[999];
     char splitter_name[999];
@@ -99,8 +108,8 @@ void expense_manager() {
             printf("%s", "Amount: ");
             scanf("%lf", &amount);
 
-            printf("%s", "Time: ");
-            scanf(" %[^\n]s", datetime);
+            //printf("%s", "Time: ");
+            //scanf(" %[^\n]s", datetime);
 
             show_table("user");
 
