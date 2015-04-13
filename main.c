@@ -117,6 +117,12 @@ void expense_manager() {
             scanf("%s", payer_name);
             sprintf(sql, "INSERT INTO balance_detail(%s) VALUES ('%.2lf')", payer_name, amount);
             rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
+            if (rc != SQLITE_OK ) {
+                system("clear");
+                printf("SQL error: %s\n", err_msg);
+                sqlite3_free(err_msg);
+                expense_manager();
+            }
 
             printf("%s", "Number of Splitter: ");
             scanf("%d", &number_of_splitter);
@@ -157,10 +163,10 @@ void expense_manager() {
             rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
             rc = sqlite3_exec(db, sql1, 0, 0, &err_msg);
             if (rc != SQLITE_OK ) {
+                system("clear");
                 printf("SQL error: %s\n", err_msg);
                 sqlite3_free(err_msg);
-            } else {
-                printf("Add Expense successfully\n");
+                expense_manager();
             }
 
             add_expense(name, amount, datetime, payer_name);
@@ -365,7 +371,6 @@ void add_user(char name[]) {
 void remove_user(char id[]) {
     int rc;
     char sql[999] = " ";
-
 
     // remove_user() doesn't remove column in paid_detail, spent_detail, and balance_detail
     sprintf(sql, "DELETE FROM user WHERE id=%s;", id);
