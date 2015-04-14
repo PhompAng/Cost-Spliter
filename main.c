@@ -88,9 +88,12 @@ void expense_manager() {
     char sql1[999] = " ";
     int rc;
 
-    printf("%s\n", "1. Show Expense");
-    printf("%s\n", "2. Add Expense");
-    printf("%s\n", "3. Back");
+    printf("%s\n", "================================================================================");
+    printf("%s\n", " 1 | Show Expense");
+    printf("%s\n", " 2 | Add Expense");
+    printf("%s\n", "---+----------------------------------------------------------------------------");
+    printf("%s\n", " 3 | Back");
+    printf("%s\n", "================================================================================");
 
     printf("%s", "Enter Choice: ");
     scanf("%d", &choice);
@@ -392,10 +395,13 @@ void user_manager() {
     char sql[999] = " ";
     int rc;
 
-    printf("%s\n", "1. Show User");
-    printf("%s\n", "2. Add User");
-    printf("%s\n", "3. Remove User");
-    printf("%s\n", "4. Back");
+    printf("%s\n", "================================================================================");
+    printf("%s\n", " 1 | Show User");
+    printf("%s\n", " 2 | Add User");
+    printf("%s\n", " 3 | Remove User");
+    printf("%s\n", "---+----------------------------------------------------------------------------");
+    printf("%s\n", " 4 | Back");
+    printf("%s\n", "================================================================================");
 
     printf("%s", "Enter choice: ");
     scanf("%d", &choice);
@@ -439,10 +445,16 @@ void user_manager() {
 void draw_main() {
     int choice;
 
-    printf("%s\n", "1. User Manager");
-    printf("%s\n", "2. Expense Manager");
-    printf("%s\n", "3. Show Balance");
-    printf("%s\n", "0. Exit");
+    printf("%s\n", "╔═╗┌─┐┌─┐┌┬┐   ╔═╗┌─┐┬  ┬┌┬┐┌┬┐┌─┐┬─┐");
+    printf("%s\n", "║  │ │└─┐ │ ───╚═╗├─┘│  │ │  │ ├┤ ├┬┘");
+    printf("%s\n", "╚═╝└─┘└─┘ ┴    ╚═╝┴  ┴─┘┴ ┴  ┴ └─┘┴└─");
+    printf("%s\n", "================================================================================");
+    printf("%s\n", " 1 | User Manager");
+    printf("%s\n", " 2 | Expense Manager");
+    printf("%s\n", " 3 | Show Balance");
+    printf("%s\n", "---+----------------------------------------------------------------------------");
+    printf("%s\n", " 0 | Exit");
+    printf("%s\n", "================================================================================");
 
     printf("%s", "Enter choice: ");
     scanf("%d", &choice);
