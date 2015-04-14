@@ -56,11 +56,11 @@ void add_expense(char name[], double amount, char datetime[], char payer_name[])
             printf("SQL error: %s\n", err_msg);
             sqlite3_free(err_msg);
         } else {
-            printf("Add Expense successfully\n");
+            printf("%s\n", "Add Expense successfully");
+            printf("%s\n", "------------------------");
             printf("name: %s\namount: %.2lf\npayer: %s\n", name, amount, payer_name);
         }
     }
-    printf("=================================\n");
 }
 
 void expense_manager() {
@@ -290,8 +290,6 @@ void show_balance() {
 
     show_owe();
 
-    printf("\n=================================\n");
-
 }
 
 void show_sum(char table[]) {
@@ -418,7 +416,6 @@ void user_manager() {
             scanf("%s", name);
 
             add_user(name);
-            printf("=================================\n");
 
             user_manager();
             break;
@@ -429,7 +426,6 @@ void user_manager() {
             scanf("%s", id);
 
             remove_user(id);
-            printf("=================================\n");
 
             user_manager();
             break;
@@ -445,6 +441,7 @@ void user_manager() {
 void draw_main() {
     int choice;
 
+    printf("%s\n", "================================================================================");
     printf("%s\n", "╔═╗┌─┐┌─┐┌┬┐   ╔═╗┌─┐┬  ┬┌┬┐┌┬┐┌─┐┬─┐");
     printf("%s\n", "║  │ │└─┐ │ ───╚═╗├─┘│  │ │  │ ├┤ ├┬┘");
     printf("%s\n", "╚═╝└─┘└─┘ ┴    ╚═╝┴  ┴─┘┴ ┴  ┴ └─┘┴└─");
