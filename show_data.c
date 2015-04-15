@@ -101,46 +101,46 @@ void show_balance() {
 
     int cols = sqlite3_column_count(stmt);
 
-    printf(" ");
+    printf("┌");
     for (int i=0; i<cols; i++) {
         if (i == cols-1) {
-            printf("----------");
+            printf("──────────");
         } else {
-            printf("-----------");
+            printf("──────────┬");
         }
     }
-    printf("\n");
-    printf("|%10.10s", "User");
+    printf("┐\n");
+    printf("│%10.10s", "User");
     for (int i=1; i<cols; i++) {
-        printf("|%10.10s", sqlite3_column_name(stmt, i));
+        printf("│%10.10s", sqlite3_column_name(stmt, i));
     }
-    printf("|\n|");
+    printf("│\n├");
     for (int i=0; i<cols; i++) {
         if (i == cols-1) {
-            printf("----------|");
+            printf("──────────┤");
         } else {
-            printf("----------+");
+            printf("──────────┼");
         }
     }
 
-    printf("\n|%10.10s|", "Paid");
+    printf("\n│%10.10s│", "Paid");
     show_sum("paid_detail");
 
-    printf("|%10.10s|", "Consumed");
+    printf("│%10.10s│", "Consumed");
     show_sum("spent_detail");
 
-    printf("|%10.10s|", "Balance");
+    printf("│%10.10s│", "Balance");
     show_sum("balance_detail");
 
-    printf(" ");
+    printf("└");
     for (int i=0; i<cols; i++) {
         if (i == cols-1) {
-            printf("----------");
+            printf("──────────");
         } else {
-            printf("-----------");
+            printf("──────────┴");
         }
     }
-    printf("\n");
+    printf("┘\n");
 
     show_owe();
 }
@@ -176,24 +176,24 @@ void show_table(char table[]) {
     rc = sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
     int cols = sqlite3_column_count(stmt);
 
-    printf(" ");
+    printf("┌");
     for (int i=0; i<cols; i++) {
         if (i == cols-1) {
-            printf("----------");
+            printf("──────────");
         } else {
-            printf("-----------");
+            printf("──────────┬");
         }
     }
-    printf("\n");
+    printf("┐\n");
     for (int i=0; i<cols; i++) {
-        printf("|%10.10s", sqlite3_column_name(stmt, i));
+        printf("│%10.10s", sqlite3_column_name(stmt, i));
     }
-    printf("|\n|");
+    printf("│\n├");
     for (int i=0; i<cols; i++) {
         if (i == cols-1) {
-            printf("----------|");
+            printf("──────────┤");
         } else {
-            printf("----------+");
+            printf("──────────┼");
         }
     }
     printf("\n");
@@ -209,13 +209,13 @@ void show_table(char table[]) {
 
         exit(1);
     }
-    printf(" ");
+    printf("└");
     for (int i=0; i<cols; i++) {
         if (i == cols-1) {
-            printf("----------");
+            printf("──────────");
         } else {
-            printf("-----------");
+            printf("──────────┴");
         }
     }
-    printf("\n");
+    printf("┘\n");
 }

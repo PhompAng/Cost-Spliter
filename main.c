@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <unistd.h>
 #include "callback.h"
 #include "show_data.h"
 #include "user_manager.h"
@@ -23,8 +24,19 @@ int main(void) {
     }
 
     system("clear");
+
+    printf("%s\n", "════════════════════════════════════════════════════════════════════════════════");
+    printf("%s\n", "                     ╔═╗┌─┐┌─┐┌┬┐   ╔═╗┌─┐┬  ┬┌┬┐┌┬┐┌─┐┬─┐");
+    printf("%s\n", "                     ║  │ │└─┐ │ ───╚═╗├─┘│  │ │  │ ├┤ ├┬┘");
+    printf("%s\n", "                     ╚═╝└─┘└─┘ ┴    ╚═╝┴  ┴─┘┴ ┴  ┴ └─┘┴└─");
+    printf("%s\n", "════════════════════════════════════════════════════════════════════════════════");
+
+    sleep(3);
+
+    system("clear");
     draw_main();
     sqlite3_close(db);
     printf("%s\n", "BYE");
+    system("clear");
     return 0;
 }
