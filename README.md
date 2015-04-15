@@ -4,10 +4,12 @@ Cost-Spliter lets you manage expense while on a trip with friends. It generate t
 -------------
 ##Requirement
 
-- cygwin with ncurse installed
+- cygwin
+- ncurse
+- libsqlite3-dev
 
 ##Compiling
 
  ```sh
- gcc -std=c99 main.c -lsqlite3
+ gcc -std=c99 *.c -lsqlite3
  ```
