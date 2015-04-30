@@ -119,14 +119,63 @@ void add_expense() {
     }
 }
 
+void remove_expense(char id[]) {
+    char *err_msg = 0;
+    int rc;
+    char sql[999] = " ";
+    int num;
+
+    sprintf(sql, "DELETE FROM expense WHERE id=%s;", id);
+    rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
+    system("clear");
+    if (rc != SQLITE_OK ) {
+        printf("SQL error: %s\n", err_msg);
+        sqlite3_free(err_msg);
+    }
+    sprintf(sql, "DELETE FROM paid_detail WHERE id=%s;", id);
+    rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
+    if (rc != SQLITE_OK ) {
+        printf("SQL error: %s\n", err_msg);
+        sqlite3_free(err_msg);
+    }
+    sprintf(sql, "DELETE FROM spent_detail WHERE id=%s;", id);
+    rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
+    if (rc != SQLITE_OK ) {
+        printf("SQL error: %s\n", err_msg);
+        sqlite3_free(err_msg);
+    }
+    num = atoi(id);
+    num *= 2;
+    sprintf(id, "%d", num);
+    sprintf(sql, "DELETE FROM balance_detail WHERE id=%s;", id);
+    rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
+    if (rc != SQLITE_OK ) {
+        printf("SQL error: %s\n", err_msg);
+        sqlite3_free(err_msg);
+    }
+    num = atoi(id);
+    num -= 1;
+    sprintf(id, "%d", num);
+    sprintf(sql, "DELETE FROM balance_detail WHERE id=%s;", id);
+    rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
+    if (rc != SQLITE_OK ) {
+        printf("SQL error: %s\n", err_msg);
+        sqlite3_free(err_msg);
+    } else {
+        printf("ID %s deleted successfully\n", id);
+    }
+}
+
 void expense_manager() {
     int choice;
+    char id[999];
 
     printf("%s\n", "═══╦════════════════════════════════════════════════════════════════════════════");
     printf("%s\n", " 1 │ Show Expense");
     printf("%s\n", " 2 │ Add Expense");
+    printf("%s\n", " 3 | Remove Expense");
     printf("%s\n", "───┼────────────────────────────────────────────────────────────────────────────");
-    printf("%s\n", " 3 │ Back");
+    printf("%s\n", " 4 │ Back");
     printf("%s\n", "═══╩════════════════════════════════════════════════════════════════════════════");
 
     printf("%s", "Enter Choice: ");
@@ -143,6 +192,15 @@ void expense_manager() {
             expense_manager();
             break;
         case 3:
+            show_table("expense");
+
+            printf("%s", "Enter ID: ");
+            scanf("%s", id);
+
+            remove_expense(id);
+            expense_manager();
+            break;
+        case 4:
             draw_main();
             break;
         default:
